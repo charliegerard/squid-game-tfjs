@@ -11,7 +11,8 @@ const elHowTo = document.querySelector(".howto");
 const elGame = document.querySelector(".game");
 const elContainer = document.querySelector(".container");
 const elTime = document.querySelector(".timer .time");
-const elReplay = document.querySelector(".replay");
+const elReplay1 = document.querySelector(".replay1");
+const elReplay2 = document.querySelector(".replay2");
 
 const elDead = document.querySelector(".dead");
 const elWin = document.querySelector(".win");
@@ -28,8 +29,10 @@ const GAME_TIME = 15;
 
 const countdownEl = document.querySelector(".countdown");
 let countdownInterval;
+let timerInterval;
 let playing = false;
 let playerHasWon;
+let gameFinished = false;
 let isDead = false;
 
 function init() {
@@ -59,10 +62,10 @@ elStart.addEventListener("click", () => {
 const initTimer = (time) => {
   let maxTime = time ? time : 14;
 
-  const startTimer = setInterval(() => {
+  timerInterval = setInterval(() => {
     // clear interval if the player has reached the end
     if (playerHasWon) {
-      clearInterval(startTimer);
+      clearInterval(timerInterval);
       return;
     }
     const formatSeconds = maxTime < 10 ? `0${maxTime}` : maxTime;
@@ -72,7 +75,7 @@ const initTimer = (time) => {
     } else {
       // timeout
       timeOut();
-      clearInterval(startTimer);
+      clearInterval(timerInterval);
       return;
     }
   }, 1000);
@@ -93,19 +96,28 @@ const startCountdown = () => {
 };
 
 function reachedEnd() {
-  watchingTween.kill();
-  sigh.currentTime = 0;
-  sigh.play();
-  audioDoll.pause();
+  if (!gameFinished) {
+    if (watchingTween) {
+      watchingTween.kill();
+    }
 
-  playing = false;
-  elHowTo.classList.replace("is-hidden", "is-howto-visible");
-  elWin.classList.add("is-visible");
-  elContainer.classList.remove("is-playing");
+    sigh.currentTime = 0;
+    sigh.play();
+    audioDoll.pause();
+
+    playing = false;
+    elHowTo.classList.replace("is-hidden", "is-howto-visible");
+    elWin.classList.replace("is-hidden", "is-visible");
+    elContainer.classList.remove("is-playing");
+    clearInterval(timerInterval);
+    gameFinished = true;
+  }
 }
 
 function timeOut() {
-  watchingTween.kill();
+  if (watchingTween) {
+    watchingTween.kill();
+  }
   audioDoll.pause();
   shotGun.currentTime = 0;
   shotGun.play();
@@ -114,11 +126,15 @@ function timeOut() {
   elHowTo.classList.replace("is-hidden", "is-howto-visible");
   elDead.classList.replace("is-hidden", "is-visible");
   elContainer.classList.remove("is-playing");
+  clearInterval(timerInterval);
 }
 
 function dead() {
   isDead = true;
-  watchingTween.kill();
+  if (watchingTween) {
+    watchingTween.kill();
+  }
+
   audioDoll.pause();
   shotGun.currentTime = 0;
   shotGun.play();
@@ -127,6 +143,7 @@ function dead() {
   elHowTo.classList.replace("is-hidden", "is-howto-visible");
   elDead.classList.replace("is-hidden", "is-visible");
   elContainer.classList.remove("is-playing");
+  clearInterval(timerInterval);
 }
 
 let watchingTween = null;
@@ -251,6 +268,7 @@ window.addEventListener("resize", onWindowResize, false);
 onWindowResize();
 
 function replay() {
+  gameFinished = false;
   elContainer.classList.add("is-playing");
   elHowTo.classList.replace("is-howto-visible", "is-hidden");
   elDead.classList.replace("is-visible", "is-hidden");
@@ -263,7 +281,10 @@ function replay() {
   startTime = Date.now();
   resetCounter();
 }
-elReplay.addEventListener("click", () => {
+elReplay1.addEventListener("click", () => {
+  replay();
+});
+elReplay2.addEventListener("click", () => {
   replay();
 });
 
@@ -429,7 +450,7 @@ const detectPosesRealTime = async (detector) => {
 };
 
 const detectReachedEnd = (rightShoulder, leftShoulder) => {
-  if (rightShoulder.x < 400 && window.innerWidth - leftShoulder.x < 400) {
+  if (rightShoulder.x < 400 && window.innerWidth - leftShoulder.x < 550) {
     return true;
   }
   return false;
@@ -438,12 +459,11 @@ const detectReachedEnd = (rightShoulder, leftShoulder) => {
 const detectMovement = (currentPositions, previousPositions) => {
   let shouldersRatio =
     ((currentPositions[0].x - currentPositions[1].x) * 100) / window.innerWidth;
-  // console.log(shouldersRatio);
 
   // let movementLimit = shouldersRatio > 10 ? 30 : 15;
   let movementLimit;
   if (shouldersRatio > 15) {
-    movementLimit = 30;
+    movementLimit = 100;
   } else if (shouldersRatio < 15 && shouldersRatio > 5) {
     movementLimit = 15;
   } else if (shouldersRatio < 5) {
