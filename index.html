@@ -4,7 +4,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
-      Squid Game's "Green light, red light" with body tracking using
+      Squid Game's "Reg light, green light" with body tracking using
       TensorFlow.js - by Charlie Gerard
     </title>
     <link
@@ -33,7 +33,7 @@
       </div>
     </main>
 
-    <div class="howto ui is-visible">
+    <div class="howto ui is-howto-visible">
       <svg viewBox="0 0 191.99 60.82">
         <path
           d="M28.3,10.23A22.3,22.3,0,1,1,6,32.53a22.29,22.29,0,0,1,22.3-22.3m0-6a28.3,28.3,0,1,0,28.29,28.3A28.33,28.33,0,0,0,28.3,4.23Z"
@@ -48,65 +48,47 @@
           fill="#fff"
         />
       </svg>
-      <h1>Red Light, Green Light</h1>
-      <p>You have 15 seconds to reach the end of the field.</p>
-      <p>Start by taking steps back as far as you can.</p>
-      <p>
-        When the doll is not watching, move forward until you reach your
-        computer.
-      </p>
-      <p>
-        If movement is detected when the doll is watching, you are eliminated.
-      </p>
-      <p class="note">
-        Original demo using face tracking by Louis Hoebregts, this demo uses
-        full body tracking using TensorFlow.js
-      </p>
-      <p class="countdown"></p>
-      <button class="cta start"></button>
-    </div>
-    <div class="dead ui">
-      <svg viewBox="0 0 191.99 60.82">
-        <path
-          d="M28.3,10.23A22.3,22.3,0,1,1,6,32.53a22.29,22.29,0,0,1,22.3-22.3m0-6a28.3,28.3,0,1,0,28.29,28.3A28.33,28.33,0,0,0,28.3,4.23Z"
-          fill="#fff"
-        />
-        <path
-          d="M186,10.57V54.49H142.06V10.57H186m6-6H136.06V60.49H192V4.57Z"
-          fill="#fff"
-        />
-        <path
-          d="M93.18,12l23.7,41.05H69.48l23.7-41m0-12L88,9,64.28,50.05l-5.19,9h68.19l-5.2-9L98.38,9l-5.2-9Z"
-          fill="#fff"
-        />
-      </svg>
-      <h1>You died!</h1>
-      <p>
-        Oops, it looks like you were moving too much or your reached the
-        timeout...
-      </p>
-      <button class="cta replay replay1 is-ready">Replay</button>
-    </div>
-    <div class="win ui">
-      <svg viewBox="0 0 191.99 60.82">
-        <path
-          d="M28.3,10.23A22.3,22.3,0,1,1,6,32.53a22.29,22.29,0,0,1,22.3-22.3m0-6a28.3,28.3,0,1,0,28.29,28.3A28.33,28.33,0,0,0,28.3,4.23Z"
-          fill="#fff"
-        />
-        <path
-          d="M186,10.57V54.49H142.06V10.57H186m6-6H136.06V60.49H192V4.57Z"
-          fill="#fff"
-        />
-        <path
-          d="M93.18,12l23.7,41.05H69.48l23.7-41m0-12L88,9,64.28,50.05l-5.19,9h68.19l-5.2-9L98.38,9l-5.2-9Z"
-          fill="#fff"
-        />
-      </svg>
-      <h1>You won!</h1>
-      <p>Well done, you survived... for now.</p>
-      <button class="cta replay replay2 is-ready">Replay</button>
+      <section class="intro is-visible">
+        <h1>Red Light, Green Light</h1>
+        <p>You have 15 seconds to reach the end of the field.</p>
+        <p>
+          When the doll is not watching, move forward until you reach your
+          computer.
+        </p>
+        <p>
+          If movement is detected when the doll is watching, you are eliminated.
+        </p>
+        <p>
+          When you're ready, click 'Start' and take steps back as far as you
+          can.
+        </p>
 
-      <script src="index.js"></script>
+        <p class="countdown"></p>
+        <button class="cta start">Loading...</button>
+      </section>
+
+      <section class="dead is-hidden">
+        <h1>You died!</h1>
+        <p>
+          Oops, it looks like you were moving too much or your reached the
+          timeout...
+        </p>
+        <button class="cta replay is-ready">Replay</button>
+      </section>
+
+      <section class="win is-hidden">
+        <h1>You won!</h1>
+        <p>Well done, you survived... for now.</p>
+        <button class="cta replay is-ready">Replay</button>
+      </section>
     </div>
+
+    <footer>
+      Made by
+      <a href="https://twitter.com/devdevcharlie">Charlie Gerard</a> using
+      TensorFlow.js. Inspired by Louis Hoebregts'
+      <a href="https://codepen.io/Mamboleoo/pen/abydvaG">original demo</a>
+    </footer>
+    <script src="index.js"></script>
   </body>
 </html>

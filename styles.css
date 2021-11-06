@@ -3,6 +3,10 @@
   src: url("https://assets.codepen.io/127738/digital-7+%28mono%29.ttf")
     format("truetype");
 }
+body {
+  margin: 0;
+}
+
 .timer {
   font-family: Digital, monospace;
   font-size: min(max(14px, 7vw), 46px);
@@ -15,30 +19,7 @@
   bottom: 1.5vw;
   left: 1.5vw;
 }
-.distance {
-  font-family: Digital, monospace;
-  font-size: min(max(14px, 7vw), 46px);
-  color: #d7213c;
-  border: 5px outset #8b8b8b;
-  background: black;
-  text-align: center;
-  padding: 0 20px;
-  position: absolute;
-  top: 1.5vw;
-  left: 1.5vw;
-}
-.movement {
-  font-family: Digital, monospace;
-  font-size: min(max(14px, 7vw), 46px);
-  color: #d7213c;
-  border: 5px outset #8b8b8b;
-  background: black;
-  text-align: center;
-  padding: 0 20px;
-  position: absolute;
-  bottom: 1.5vw;
-  right: 1.5vw;
-}
+
 .container {
   height: 100vh;
   display: grid;
@@ -61,9 +42,6 @@
   background: white;
   z-index: 19;
 }
-body {
-  margin: 0;
-}
 
 .game {
   background: url(https://assets.codepen.io/127738/Squid_Game_Doll_bg.jpg);
@@ -74,34 +52,26 @@ body {
   font-size: 0;
   border-radius: 10px;
 }
-.doll {
-}
 
 .ui {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  max-width: 620px;
-  width: 90%;
+  position: absolute;
   background: black;
-  color: white;
+  max-width: 620px;
   z-index: 50;
   text-align: center;
   font-family: "Quicksand", sans-serif;
   font-weight: 400;
   border-radius: 20px;
+  transition: 0.3s ease-out;
+  color: white;
   box-shadow: 0 0 20px 2px #00000059;
   padding: 20px 60px;
-
   max-height: 90vh;
-  overflow: auto;
-  box-sizing: border-box;
-
+  width: 90%;
+  top: 50%;
+  left: 50%;
   opacity: 0;
-  pointer-events: none;
   transform: translate(-50%, -50%) scale(0.8);
-  transition: 0.3s ease-out;
 }
 
 .ui svg {
@@ -119,20 +89,20 @@ body {
   font-size: 26px;
 }
 
-.ui .note {
-  font-size: 0.5em;
-}
-
 .ui p {
   font-size: 18px;
   margin-bottom: 0;
   margin-top: 10px;
 }
 
-.is-visible {
+.is-visible,
+.is-howto-visible {
   opacity: 1;
-  pointer-events: auto;
-  transform: translate(-50%, -50%);
+  /* display: block; */
+}
+
+.is-hidden {
+  display: none;
 }
 
 .cta {
@@ -148,16 +118,8 @@ body {
   padding: 10px 20px;
 }
 
-.cta::before {
-  content: "Loading...";
-}
-
 .cta .is-ready {
   pointer-events: unset;
-}
-
-.is-ready::before {
-  content: "Start";
 }
 
 .win,
@@ -167,10 +129,33 @@ body {
 
 video {
   position: absolute;
+  width: 100%;
+  height: auto;
   opacity: 0;
 }
 
 p.countdown {
   font-size: 40px;
   color: white;
+}
+
+a:not(> footer) {
+  color: white;
+}
+
+footer {
+  position: absolute;
+  font-family: "Quicksand", sans-serif;
+  z-index: 10;
+  color: black;
+  text-align: center;
+  display: block;
+  width: 100%;
+  bottom: 1em;
+  font-size: 0.8em;
+  font-weight: 800;
+}
+
+footer a {
+  color: black;
 }

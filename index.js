@@ -5,15 +5,14 @@ let isWatching = true;
 let gameStarted = false;
 let distanceSinceWatching = 0;
 let startTime = Date.now();
-const elDistance = document.querySelector(".distance .total");
+const elIntro = document.querySelector(".intro");
 const elStart = document.querySelector(".start");
 const elHowTo = document.querySelector(".howto");
 const elGame = document.querySelector(".game");
 const elContainer = document.querySelector(".container");
 const elTime = document.querySelector(".timer .time");
-const elMovement = document.querySelector(".movement");
-const elReplay1 = document.querySelector(".replay1");
-const elReplay2 = document.querySelector(".replay2");
+const elReplay = document.querySelector(".replay");
+
 const elDead = document.querySelector(".dead");
 const elWin = document.querySelector(".win");
 const audioDoll = new Audio(
@@ -24,10 +23,8 @@ const shotGun = new Audio("https://assets.codepen.io/127738/shotgun.mp3");
 shotGun.volume = 0.2;
 const sigh = new Audio("https://assets.codepen.io/127738/sigh.mp3");
 
-const MAX_TIME = 60;
-const FINISH_DISTANCE = 100;
-const IN_GAME_MAX_DISTANCE = 4000;
 const MAX_MOVEMENT = 15;
+const GAME_TIME = 15;
 
 const countdownEl = document.querySelector(".countdown");
 let countdownInterval;
@@ -52,7 +49,8 @@ elStart.addEventListener("click", () => {
     initTimer();
 
     elContainer.classList.add("is-playing");
-    elHowTo.classList.remove("is-visible");
+    elHowTo.classList.replace("is-howto-visible", "is-hidden");
+    elIntro.classList.replace("is-visible", "is-hidden");
     clearTimeout(startCounter);
     clearInterval(countdownInterval);
   }, 5000);
@@ -81,7 +79,7 @@ const initTimer = (time) => {
 };
 
 const resetCounter = () => {
-  initTimer(9);
+  initTimer(GAME_TIME);
 };
 
 const startCountdown = () => {
@@ -101,6 +99,7 @@ function reachedEnd() {
   audioDoll.pause();
 
   playing = false;
+  elHowTo.classList.replace("is-hidden", "is-howto-visible");
   elWin.classList.add("is-visible");
   elContainer.classList.remove("is-playing");
 }
@@ -112,7 +111,8 @@ function timeOut() {
   shotGun.play();
 
   playing = false;
-  elDead.classList.add("is-visible");
+  elHowTo.classList.replace("is-hidden", "is-howto-visible");
+  elDead.classList.replace("is-hidden", "is-visible");
   elContainer.classList.remove("is-playing");
 }
 
@@ -124,13 +124,13 @@ function dead() {
   shotGun.play();
 
   playing = false;
-  elDead.classList.add("is-visible");
+  elHowTo.classList.replace("is-hidden", "is-howto-visible");
+  elDead.classList.replace("is-hidden", "is-visible");
   elContainer.classList.remove("is-playing");
 }
 
 let watchingTween = null;
 function updateWatching() {
-  console.log("heree????", isWatching);
   if (!playing) return;
 
   isWatching = !isWatching;
@@ -218,7 +218,7 @@ loader.load(
     head.position.y = 8;
     head.position.z = -1;
 
-    elStart.classList.add("is-ready");
+    elStart.innerHTML = "Start";
   },
   (xhr) => {
     console.log(`${(xhr.loaded / xhr.total) * 100}% loaded`);
@@ -252,8 +252,9 @@ onWindowResize();
 
 function replay() {
   elContainer.classList.add("is-playing");
-  elDead.classList.remove("is-visible");
-  elWin.classList.remove("is-visible");
+  elHowTo.classList.replace("is-howto-visible", "is-hidden");
+  elDead.classList.replace("is-visible", "is-hidden");
+  elWin.classList.replace("is-visible", "is-hidden");
   distance = 0;
   isWatching = true;
   distanceSinceWatching = 0;
@@ -262,10 +263,7 @@ function replay() {
   startTime = Date.now();
   resetCounter();
 }
-elReplay1.addEventListener("click", () => {
-  replay();
-});
-elReplay2.addEventListener("click", () => {
+elReplay.addEventListener("click", () => {
   replay();
 });
 
@@ -454,7 +452,6 @@ const detectMovement = (currentPositions, previousPositions) => {
 
   currentPositions.map((p, i) => {
     if (p.x - previousPositions[i].x > Math.abs(movementLimit)) {
-      console.log("YOU DIE");
       if (!isDead) {
         dead();
       }
