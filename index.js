@@ -450,7 +450,8 @@ const detectPosesRealTime = async (detector) => {
 };
 
 const detectReachedEnd = (rightShoulder, leftShoulder) => {
-  if (rightShoulder.x < 400 && window.innerWidth - leftShoulder.x < 550) {
+  // if (rightShoulder.x < 400) {
+  if (rightShoulder.x < 400 && window.innerWidth - leftShoulder.x < 1000) {
     return true;
   }
   return false;
@@ -465,7 +466,7 @@ const detectMovement = (currentPositions, previousPositions) => {
   if (shouldersRatio > 15) {
     movementLimit = 100;
   } else if (shouldersRatio < 15 && shouldersRatio > 5) {
-    movementLimit = 15;
+    movementLimit = 50;
   } else if (shouldersRatio < 5) {
     movementLimit = 3;
   }
