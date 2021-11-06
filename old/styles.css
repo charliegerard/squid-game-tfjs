@@ -48,11 +48,6 @@
   transition: 0.4s ease-out;
 }
 
-canvas {
-  width: 100%;
-  height: 100vh;
-}
-
 .container .is-playing {
   filter: brightness(1);
 }
@@ -125,7 +120,7 @@ body {
 }
 
 .ui .note {
-  font-size: 0.8em;
+  font-size: 0.5em;
 }
 
 .ui p {
@@ -173,4 +168,9 @@ body {
 video {
   position: absolute;
   opacity: 0;
+}
+
+p.countdown {
+  font-size: 40px;
+  color: white;
 }

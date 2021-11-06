@@ -25,16 +25,12 @@
     <!-- Shotgun Audio from https://soundbible.com/1919-Shotgun-Blast.html -->
     <!-- Sigh audio from https://soundbible.com/773-Sigh.html -->
 
-    <div class="container">
+    <main class="container">
       <div class="game">
         <video id="video"></video>
-        <div class="timer"><span class="time">01:00</span></div>
-        <div class="distance">
-          <span class="total">000</span> /<span>100</span>
-        </div>
-        <div class="movement"><span class="total">00%</span></div>
+        <div class="timer"><span class="time">00:15</span></div>
       </div>
-    </div>
+    </main>
 
     <div class="howto ui is-visible">
       <svg viewBox="0 0 191.99 60.82">
@@ -52,19 +48,20 @@
         />
       </svg>
       <h1>Red Light, Green Light</h1>
-      <p>You have 60 seconds to reach the end of the field.</p>
+      <p>You have 15 seconds to reach the end of the field.</p>
+      <p>Start by taking steps back as far as you can.</p>
       <p>
-        When the doll is not watching, move your head to move forward and make
-        the top left counter reach 100m.
+        When the doll is not watching, move forward until you reach your
+        computer.
       </p>
       <p>
-        But watch out to not move when the doll is watching you. If the movement
-        sensor reaches 100% on the bottom right, you are eliminated.
+        If movement is detected when the doll is watching, you are eliminated.
       </p>
       <p class="note">
-        This demo requires access to your webcam.<br />It currently doesn't work
-        on iOs Safari.
+        Original demo using face tracking by Louis Hoebregts, this demo uses
+        full body tracking using TensorFlow.js
       </p>
+      <p class="countdown"></p>
       <button class="cta start"></button>
     </div>
     <div class="dead ui">

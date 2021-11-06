@@ -27,39 +27,17 @@ const sigh = new Audio("https://assets.codepen.io/127738/sigh.mp3");
 const MAX_TIME = 60;
 const FINISH_DISTANCE = 100;
 const IN_GAME_MAX_DISTANCE = 4000;
-const MAX_MOVEMENT = 180;
+const MAX_MOVEMENT = 15;
 
+const countdownEl = document.querySelector(".countdown");
+let countdownInterval;
 let playing = false;
-
-let mycamvas;
+let playerHasWon;
+let isDead = false;
 
 function init() {
   let initialized = false;
   if (initialized) return;
-
-  let processfn = function (video, dt) {
-    // -----
-    // if (!isWatching) {
-    //   distance += _dist;
-    //   /* If user reached the end */
-    //   if (distance > IN_GAME_MAX_DISTANCE) {
-    //     reachedEnd();
-    //   }
-    // } else {
-    //   distanceSinceWatching += _dist;
-    //   if (distanceSinceWatching > MAX_MOVEMENT) {
-    //     dead();
-    //   }
-    // }
-  };
-  console.log(startTime);
-
-  updateTimer(MAX_TIME - (Date.now() - startTime) / 1000);
-
-  /* Check if reached timeout */
-  if ((Date.now() - startTime) / 1000 > MAX_TIME) {
-    timeOut();
-  }
 
   initialized = true;
   playing = true;
@@ -67,12 +45,54 @@ function init() {
 }
 
 elStart.addEventListener("click", () => {
-  init();
-  gameStarted = true;
+  startCountdown();
+  const startCounter = setTimeout(() => {
+    init();
+    gameStarted = true;
+    initTimer();
 
-  elContainer.classList.add("is-playing");
-  elHowTo.classList.remove("is-visible");
+    elContainer.classList.add("is-playing");
+    elHowTo.classList.remove("is-visible");
+    clearTimeout(startCounter);
+    clearInterval(countdownInterval);
+  }, 5000);
 });
+
+const initTimer = (time) => {
+  let maxTime = time ? time : 14;
+
+  const startTimer = setInterval(() => {
+    // clear interval if the player has reached the end
+    if (playerHasWon) {
+      clearInterval(startTimer);
+      return;
+    }
+    const formatSeconds = maxTime < 10 ? `0${maxTime}` : maxTime;
+    elTime.innerHTML = `00:${formatSeconds}`;
+    if (maxTime > 0) {
+      maxTime--;
+    } else {
+      // timeout
+      timeOut();
+      clearInterval(startTimer);
+      return;
+    }
+  }, 1000);
+};
+
+const resetCounter = () => {
+  initTimer(9);
+};
+
+const startCountdown = () => {
+  let countdown = 5;
+  countdownEl.innerHTML = countdown;
+
+  countdownInterval = setInterval(() => {
+    countdown--;
+    countdownEl.innerHTML = countdown;
+  }, 1000);
+};
 
 function reachedEnd() {
   watchingTween.kill();
@@ -97,6 +117,7 @@ function timeOut() {
 }
 
 function dead() {
+  isDead = true;
   watchingTween.kill();
   audioDoll.pause();
   shotGun.currentTime = 0;
@@ -109,7 +130,7 @@ function dead() {
 
 let watchingTween = null;
 function updateWatching() {
-  console.log("heree????");
+  console.log("heree????", isWatching);
   if (!playing) return;
 
   isWatching = !isWatching;
@@ -140,27 +161,11 @@ function updateWatching() {
   }
 }
 
-function updateTimer(timeLeft) {
-  let min = `${Math.floor(timeLeft / 60)}`;
-  if (min.length === 1) {
-    min = `0${min}`;
-  }
-  let sec = `${Math.floor(timeLeft % 60)}`;
-  if (sec.length === 1) {
-    sec = `0${sec}`;
-  }
-  if (timeLeft < 0) {
-    min = "00";
-    sec = "00";
-  }
-  elTime.innerHTML = `${min}:${sec}`;
-}
-
 /* THREEJS PART */
 const scene = new THREE.Scene();
 let sceneWidth = 0;
 if (window.innerWidth / window.innerHeight > 1.9) {
-  sceneWidth = window.innerWidth * 0.6;
+  sceneWidth = window.innerWidth * 0.8;
 } else {
   sceneWidth = window.innerWidth * 0.95;
 }
@@ -232,7 +237,7 @@ function renderWebGL() {
 /* On Resize */
 function onWindowResize() {
   if (window.innerWidth / window.innerHeight > 1.9) {
-    sceneWidth = window.innerWidth * 0.6;
+    sceneWidth = window.innerWidth * 0.8;
   } else {
     sceneWidth = window.innerWidth * 0.95;
   }
@@ -255,6 +260,7 @@ function replay() {
   playing = true;
   updateWatching();
   startTime = Date.now();
+  resetCounter();
 }
 elReplay1.addEventListener("click", () => {
   replay();
@@ -326,17 +332,12 @@ const initDetection = async () => {
 };
 
 const detectPosesRealTime = async (detector) => {
-  const poses = await detector.estimatePoses(video);
-
-  const deltas = [];
-  const previousPositions = [];
-  const currentPositions = [];
-  let previousLeftShoulderPosition = {};
+  let previousPositions = [];
 
   async function poseDetection() {
     const poses = await detector.estimatePoses(video);
 
-    if (poses) {
+    if (poses[0]) {
       const leftShoulder = poses[0].keypoints.find(
         (k) => k.name === "left_shoulder"
       );
@@ -356,22 +357,71 @@ const detectPosesRealTime = async (detector) => {
         (k) => k.name === "right_ankle"
       );
 
-      const currentLeftShoulderPosition = {
-        x: leftShoulder.x,
-        y: leftShoulder.y,
-      };
+      const currentPositions = [
+        {
+          x: leftShoulder.x,
+          y: leftShoulder.y,
+          movementThreshold: 15,
+        },
+        {
+          x: rightShoulder.x,
+          y: rightShoulder.y,
+          movementThreshold: 15,
+        },
+        {
+          x: leftElbow.x,
+          y: leftElbow.y,
+          movementThreshold: 20,
+        },
+        {
+          x: rightElbow.x,
+          y: rightElbow.y,
+          movementThreshold: 20,
+        },
+        {
+          x: leftHip.x,
+          y: leftHip.y,
+          movementThreshold: 100,
+        },
+        {
+          x: rightHip.x,
+          y: rightHip.y,
+          movementThreshold: 100,
+        },
+        {
+          x: leftKnee.x,
+          y: leftKnee.y,
+          movementThreshold: 100,
+        },
+        {
+          x: rightKnee.x,
+          y: rightKnee.y,
+          movementThreshold: 100,
+        },
+        {
+          x: leftAnkle.x,
+          y: leftAnkle.y,
+          movementThreshold: 100,
+        },
+        {
+          x: rightAnkle.x,
+          y: rightAnkle.y,
+          movementThreshold: 100,
+        },
+      ];
 
-      if (previousLeftShoulderPosition.x && gameStarted) {
-        if (
-          currentLeftShoulderPosition.x - previousLeftShoulderPosition.x >
-          Math.abs(20)
-        ) {
-          console.log("I MOVEDDDDD");
-          // dead();
-        }
+      const hasReachedEnd = detectReachedEnd(rightShoulder, leftShoulder);
+
+      if (hasReachedEnd) {
+        reachedEnd();
+        playerHasWon = true;
       }
 
-      previousLeftShoulderPosition = currentLeftShoulderPosition;
+      if (previousPositions[0] && gameStarted && isWatching) {
+        detectMovement(currentPositions, previousPositions);
+      }
+
+      previousPositions = currentPositions;
     }
 
     requestAnimationFrame(poseDetection);
@@ -380,4 +430,36 @@ const detectPosesRealTime = async (detector) => {
   poseDetection();
 };
 
-// initDetection();
+const detectReachedEnd = (rightShoulder, leftShoulder) => {
+  if (rightShoulder.x < 400 && window.innerWidth - leftShoulder.x < 400) {
+    return true;
+  }
+  return false;
+};
+
+const detectMovement = (currentPositions, previousPositions) => {
+  let shouldersRatio =
+    ((currentPositions[0].x - currentPositions[1].x) * 100) / window.innerWidth;
+  // console.log(shouldersRatio);
+
+  // let movementLimit = shouldersRatio > 10 ? 30 : 15;
+  let movementLimit;
+  if (shouldersRatio > 15) {
+    movementLimit = 30;
+  } else if (shouldersRatio < 15 && shouldersRatio > 5) {
+    movementLimit = 15;
+  } else if (shouldersRatio < 5) {
+    movementLimit = 3;
+  }
+
+  currentPositions.map((p, i) => {
+    if (p.x - previousPositions[i].x > Math.abs(movementLimit)) {
+      console.log("YOU DIE");
+      if (!isDead) {
+        dead();
+      }
+    }
+  });
+};
+
+initDetection();
