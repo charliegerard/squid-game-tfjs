@@ -431,7 +431,7 @@ const detectPosesRealTime = async (detector) => {
 
       const hasReachedEnd = detectReachedEnd(rightShoulder, leftShoulder);
 
-      if (hasReachedEnd) {
+      if (hasReachedEnd && !gameFinished) {
         reachedEnd();
         playerHasWon = true;
       }
