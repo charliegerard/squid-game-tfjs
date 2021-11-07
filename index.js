@@ -115,6 +115,7 @@ function reachedEnd() {
 }
 
 function timeOut() {
+  isDead = true;
   if (watchingTween) {
     watchingTween.kill();
   }
@@ -269,6 +270,7 @@ onWindowResize();
 
 function replay() {
   gameFinished = false;
+  isDead = false;
   elContainer.classList.add("is-playing");
   elHowTo.classList.replace("is-howto-visible", "is-hidden");
   elDead.classList.replace("is-visible", "is-hidden");
@@ -431,7 +433,7 @@ const detectPosesRealTime = async (detector) => {
 
       const hasReachedEnd = detectReachedEnd(rightShoulder, leftShoulder);
 
-      if (hasReachedEnd && !gameFinished) {
+      if (hasReachedEnd && !isDead) {
         reachedEnd();
         playerHasWon = true;
       }
